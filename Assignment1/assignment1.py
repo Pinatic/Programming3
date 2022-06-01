@@ -1,8 +1,14 @@
 import argparse as ap
-
+import os
 from Bio import Entrez
 
 if __name__ == "__main__":
+
+    path = "/output"
+    isPath = os.path.exists(path)
+    if not isPath:
+        os.makedirs(path)
+
     argparser = ap.ArgumentParser(description="Script that downloads (default) 10 articles referenced by the given PubMed ID concurrently.")
     argparser.add_argument("-n", action="store",
                            dest="n", required=False, type=int, default=10,
