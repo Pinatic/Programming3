@@ -14,8 +14,7 @@ def plotter(file):
     with open(file, "r", encoding = "utf8") as data:
         for line in data:
             if line[0].isdigit():
-                line = line.strip()
-                threadtimes.append(line.split(":"))
+                threadtimes.append(line.strip().split(":"))
     
     plt.scatter([x[0] for x in threadtimes], [x[1] for x in threadtimes])
     plt.title("Time vs number of threads")
