@@ -7,8 +7,6 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=p.w.j.de.jong@st.hanze.nl
 
-#bash script that saves timings from using 1 till 16 threads
-
 export BLASTDB=/local-fs/datasets/
 
 mkdir -p output
