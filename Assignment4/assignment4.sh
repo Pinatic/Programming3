@@ -7,5 +7,9 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=p.w.j.de.jong@st.hanze.nl
 
-export mgfile1=/data/dataprocessing/MinIONData/MG5267/MG5267_TGACCA_L008_R1_001_BC24EVACXX.filt.fastq
-export mgfile2=/data/dataprocessing/MinIONData/MG5267/MG5267_TGACCA_L008_R2_001_BC24EVACXX.filt.fastq
+export FILE1=/data/dataprocessing/MinIONData/MG5267/MG5267_TGACCA_L008_R1_001_BC24EVACXX.filt.fastq
+export FILE2=/data/dataprocessing/MinIONData/MG5267/MG5267_TGACCA_L008_R2_001_BC24EVACXX.filt.fastq
+export OUTPUT=/students/2021-2022/master/Pieter_DSLS/output
+
+mkdir -p /students/2021-2022/master/Pieter_DSLS/output
+mkdir -p output
