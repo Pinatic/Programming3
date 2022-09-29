@@ -1,0 +1,11 @@
+#!/bin/bash
+#SBATCH --time 5:00:00
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=16
+#SBATCH --job-name=Assignment3_pwjdejong
+#SBATCH --partition=assemblix
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=p.w.j.de.jong@st.hanze.nl
+
+export mgfile1=/data/dataprocessing/MinIONData/MG5267/MG5267_TGACCA_L008_R1_001_BC24EVACXX.filt.fastq
+export mgfile2=/data/dataprocessing/MinIONData/MG5267/MG5267_TGACCA_L008_R2_001_BC24EVACXX.filt.fastq
