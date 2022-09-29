@@ -19,8 +19,12 @@ def plotter(file):
             if line[0].isdigit():
                 threadtimes.append(line.strip().split(":"))
     
+    # separate the values to times and threads
+    thread = [x[1] for x in threadtimes]
+    time = [x[0] for x in threadtimes]
     
-    plt.scatter([x[0] for x in threadtimes], [x[1] for x in threadtimes])
+    # plot the values and save to file
+    plt.scatter(time, thread)
     plt.title("Time vs number of threads")
     plt.xlabel("Number of threads")
     plt.ylabel("Running time")
