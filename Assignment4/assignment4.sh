@@ -13,3 +13,5 @@ export OUTPUT=/students/2021-2022/master/Pieter_DSLS/output
 
 mkdir -p /students/2021-2022/master/Pieter_DSLS/output
 mkdir -p output
+
+#run velveth and velvetg
