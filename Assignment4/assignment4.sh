@@ -16,4 +16,4 @@ mkdir -p output
 
 #run velveth and velvetg
 
-parallel -j 16 echo {%} :::
+parallel -j 16 "velveth $OUTPUT/{} {} -fastq -longPaired $FILE_R1 $FILE_R2 && velvetg $OUTPUT/
