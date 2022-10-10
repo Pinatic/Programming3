@@ -2,6 +2,9 @@ from Bio import SeqIO
 import os
 import sys
 
+def contig_parser(input):
+  seq_list = []
+
 def calc_N50():
   
 if __name__ = "__main__":
