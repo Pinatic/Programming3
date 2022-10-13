@@ -6,7 +6,5 @@ def get_best_kmer(file):
     best_kmer = kmer_file.sort_values("N50", ascending=False).iloc[0, 1]
     return best_kmer
 
-
-
 if __name__ == "__main__":
     best_kmer = get_best_kmer("output/output.csv")
