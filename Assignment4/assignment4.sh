@@ -2,7 +2,7 @@
 #SBATCH --time 48:00:00
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=16
-#SBATCH --job-name=Assignment3_pwjdejong
+#SBATCH --job-name=Assignment4_pwjdejong
 #SBATCH --partition=assemblix
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=p.w.j.de.jong@st.hanze.nl
