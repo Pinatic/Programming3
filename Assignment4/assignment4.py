@@ -12,10 +12,6 @@ def contig_parser(input_file):
         seq_lengths_list.append(len(key[1].seq))
     seq_lengths_list.append(5)
 
-    with open("seq_list", "w", newline="") as myfile:
-        wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-        wr.writerow(seq_lengths_list)
-
     return seq_lengths_list
 
 def calculate_N50(seq_lengths_list):
