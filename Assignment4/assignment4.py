@@ -1,38 +1,14 @@
 import os
 import sys
+from Bio import SeqIO
 
 def contig_parser(input_file):
     #appends the length of each sequence to a list
     seq_lengths_list = []
-    header = None
-    length = 0
-
-    with open(input_file) as fasta:
-        for line in fasta:
-            line = line.rstrip()
-            if line.startswith(">"):
-                if header is not None:
-                    seq_lengths_list.append(length)
-                header = line[1:]
-            else:
-                length += len(line)
-    if length:
-        seq_lengths_list.append(length)
-
-    return seq_lengths_list
-
-    seq_list_unfiltered = [str(line.strip()) for line in input_file]
-    tmp_seq_list = []
-    seq_lengths = []
-
-    for line in seq_list_unfiltered:
-        if not line.startswith(">"):
-            tmp_seq_list.append(line)
-        else:
-            seq_lengths.append(tmp_seq_list)
-            tmp_seq_list = []
-
-    seq_lengths_list = [len(seq) for seq in seq_lengths]
+    
+    record_dict = SeqIO.to_dict(SeqIO.parse(input_file, "fasta"))
+    for key in record_dict.items():
+        seq_lengths_list.append(len(key[1].seq))
 
     return seq_lengths_list
 
