@@ -7,8 +7,8 @@ def contig_parser(input_file):
     seq_lengths_list = []
     
     record_dict = SeqIO.to_dict(SeqIO.parse(input_file, "fasta"))
-    for key in record_dict.items():
-        seq_lengths_list.append(len(key[1].seq))
+    for key in record_dict.keys():
+        seq_lengths_list.append(len(record_dict[key]))
 
     return seq_lengths_list
 
