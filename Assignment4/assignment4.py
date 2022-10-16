@@ -1,14 +1,20 @@
 import os
 import sys
 from Bio import SeqIO
+import csv
 
 def contig_parser(input_file):
     #appends the length of each sequence to a list
     seq_lengths_list = []
     
     record_dict = SeqIO.to_dict(SeqIO.parse(input_file, "fasta"))
-    for key in record_dict.keys():
-        seq_lengths_list.append(len(record_dict[key]))
+    for key in record_dict.items():
+        seq_lengths_list.append(len(key[1].seq))
+    seq_lengths_list.append(5)
+
+    with open("seq_list", "w", newline="") as myfile:
+        wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+        wr.writerow(seq_lengths_list)
 
     return seq_lengths_list
 

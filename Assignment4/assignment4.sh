@@ -16,7 +16,7 @@ mkdir -p output
 
 #run velveth and velvetg
 
-seq 20 2 30 | parallel -j16 'velveth $OUTPUT/{} {} -longPaired -fastq $FILE_R1 $FILE_R2 && velvetg $OUTPUT/{} && cat &OUTPUT/{}/contigs.fa | (python3 assignment4.py && echo -e {}; ) >> output/output.csv'
+seq 20 2 30 | parallel -j16 'velveth $OUTPUT/{} {} -longPaired -fastq $FILE_R1 $FILE_R2 && velvetg $OUTPUT/{} && cat $OUTPUT/{}/contigs.fa | (python3 assignment4.py && echo -e {}; ) >> output/output.csv'
 
 #run the cleanup
 
