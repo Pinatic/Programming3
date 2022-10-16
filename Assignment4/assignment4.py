@@ -2,15 +2,15 @@ from Bio import SeqIO
 import os
 import sys
 
-def contig_parser(input):
+def contig_parser(input_file):
     #appends the length of each sequence to a list
     seq_lengths = []
-    seq_list_unfiltered = SeqIO.to_dict(SeqIO.parse(input, "fasta"))
+    seq_dict = {rec.id : rec.seq for rec in SeqIO.parse(input_file, "fasta")}
 
-    for seq in seq_list_unfiltered.items():
+    #seq_list_unfiltered = SeqIO.to_dict(SeqIO.parse(input, "fasta"))
+
+    for seq in seq_dict.items():
         seq_lengths.append(len(seq[1].seq))
-    
-    seq_lengths.sort(key=len)
 
     return seq_lengths
 
