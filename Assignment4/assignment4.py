@@ -3,6 +3,23 @@ import sys
 
 def contig_parser(input_file):
     #appends the length of each sequence to a list
+    seq_lengths_list = []
+    header = None
+    length = 0
+
+    with open(input_file) as fasta:
+        for line in fasta:
+            line = line.rstrip()
+            if line.startswith(">"):
+                if header is not None:
+                    seq_lengths_list.append(length)
+                header = line[1:]
+            else:
+                length += len(line)
+    if length:
+        seq_lengths_list.append(length)
+
+    return seq_lengths_list
 
     seq_list_unfiltered = [str(line.strip()) for line in input_file]
     tmp_seq_list = []
