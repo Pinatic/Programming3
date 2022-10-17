@@ -1,3 +1,4 @@
+from ast import In
 import pandas as pd
 import os
 import pyspark
@@ -9,7 +10,7 @@ class InterPRO_PS:
         if not os.path.exists("output"):
             os.makedirs("output")
 
-    def start_SparkSession(self, host_location):
+    def start_sparksession(self, host_location):
         """
         Creates sparksession at given location with given number of threads
         returns this session
@@ -20,10 +21,18 @@ class InterPRO_PS:
             .getOrCreate()
         return spark
 
-    def file_loader(self, ):
+    def file_loader(self, path, dilim, pyspark_obj):
         """
         Loads in the tsv file and returns the data
+        .tsv uses /t dilimiter
         """
+        data = pyspark_obj.read.options(dilimiter=dilim).csv(path)
+        return data
+    
+    def get_questions(self, df):
+        
+
+
 
 #"1. How many distinct protein annotations are found in the dataset? I.e. how many distinc InterPRO numbers are there?\n",
 
@@ -50,4 +59,11 @@ class InterPRO_PS:
     #2 answer
     #3 scheduler's physical plan as string using .explain()
 
-if __name == "__main__":
+if __name__ == "__main__":
+    #initiate object
+    InterPRO_PS_obj = InterPRO_PS()
+    #initiate session
+    pss = InterPRO_PS_obj.start_sparksession("local[12]")
+    #load the data
+    path = "/data/dataprocessing/interproscan/all_bacilli.tsv"
+    df = InterPRO_PS_obj.file_loader(path, "\t", pss)
