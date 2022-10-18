@@ -43,26 +43,27 @@ class InterPRO_PS:
 
 
 
+        #"3. What is the most common GO Term found?\n",
 
-#"1. How many distinct protein annotations are found in the dataset? I.e. how many distinc InterPRO numbers are there?\n",
+        #"4. What is the average size of an InterPRO feature found in the dataset?\n",
 
-#"2. How many annotations does a protein have on average?\n",
+        #"5. What is the top 10 most common InterPRO features?\n",
 
-#"3. What is the most common GO Term found?\n",
+        #"6. If you select InterPRO features that are almost the same size (within 90-100%) as the protein itself, what is the top10 then?\n",
 
-#"4. What is the average size of an InterPRO feature found in the dataset?\n",
+        #"7. If you look at those features which also have textual annotation, what is the top 10 most common word found in that annotation?\n",
 
-#"5. What is the top 10 most common InterPRO features?\n",
+        #"8. And the top 10 least common?\n",
 
-#"6. If you select InterPRO features that are almost the same size (within 90-100%) as the protein itself, what is the top10 then?\n",
+        #"9. Combining your answers for Q6 and Q7, what are the 10 most commons words found for the largest InterPRO features?\n",
 
-#"7. If you look at those features which also have textual annotation, what is the top 10 most common word found in that annotation?\n",
+        #"10. What is the coefficient of correlation ($R^2$) between the size of the protein and the number of features found?\n",
 
-#"8. And the top 10 least common?\n",
-
-#"9. Combining your answers for Q6 and Q7, what are the 10 most commons words found for the largest InterPRO features?\n",
-
-#"10. What is the coefficient of correlation ($R^2$) between the size of the protein and the number of features found?\n",
+        Question = list(range(1, 3))
+        Answer = list([Q1_answer, Q2_answer])
+        Explain = list([Q1_explain, Q2_explain])
+        data = pd.DataFrame({"Question": Question, "Answer": Answer, "Explain": Explain})
+        data.to_csv("output/assignment5.csv", index=False)
 
 #output should be csv with 3 columns:
     #1 question number
@@ -73,7 +74,9 @@ if __name__ == "__main__":
     #initiate object
     InterPRO_PS_obj = InterPRO_PS()
     #initiate session
-    pss = InterPRO_PS_obj.start_sparksession("local[12]")
+    pss = InterPRO_PS_obj.start_sparksession("local[16]")
     #load the data
     path = "/data/dataprocessing/interproscan/all_bacilli.tsv"
     df = InterPRO_PS_obj.file_loader(path, "\t", pss)
+    InterPRO_PS_obj.get_questions(df)
+    pss.sparkContext.stop()
