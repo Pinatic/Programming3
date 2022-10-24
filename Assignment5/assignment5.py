@@ -31,37 +31,59 @@ class InterPRO_PS:
     
     def get_questions(self, df):
         
-        #Question 1. How many distinct protein annotations are found in the dataset? I.e. how many distinc InterPRO numbers are there?
+        #1. How many distinct protein annotations are found in the dataset? I.e. how many distinc InterPRO numbers are there?
         Q1_explain = df.select("_c11").filter(df._c11 != "-").distinct()._jdf.queryExecution().toString()
         Q1_answer = df.select("_c11").filter(df._c11 != "-").distinct().count()
         Q1 = [1, Q1_answer, Q1_explain]
 
-        #question 2. How many annotations does a protein have on average?
+        #2. How many annotations does a protein have on average?
         Q2_explain = df.select("_c11").filter(df._c11 != "-").distinct()._jdf.queryExecution().toString()
         Q2_answer = df.select("_c11").filter(df._c11 != "-").count() / df.select("_c11").filter(df._c11 != "-").distinct().count()
         Q2 = [2, Q2_answer, Q2_explain]
 
+        #3. What is the most common GO Term found?
+        Q3_explain = 
+        Q3_answer = 
+        Q3 = 
 
+        #4. What is the average size of an InterPRO feature found in the dataset?
+        Q4_explain = 
+        Q4_answer = 
+        Q4 = 
 
-        #"3. What is the most common GO Term found?\n",
+        #5. What is the top 10 most common InterPRO features?
+        Q5_explain = 
+        Q5_answer = 
+        Q5 = 
 
-        #"4. What is the average size of an InterPRO feature found in the dataset?\n",
+        #6. If you select InterPRO features that are almost the same size (within 90-100%) as the protein itself, what is the top10 then?
+        Q6_explain = 
+        Q6_answer = 
+        Q6 = 
 
-        #"5. What is the top 10 most common InterPRO features?\n",
+        #7. If you look at those features which also have textual annotation, what is the top 10 most common word found in that annotation?
+        Q7_explain = 
+        Q7_answer = 
+        Q7 = 
 
-        #"6. If you select InterPRO features that are almost the same size (within 90-100%) as the protein itself, what is the top10 then?\n",
+        #8. And the top 10 least common?
+        Q8_explain = 
+        Q8_answer = 
+        Q8 = 
 
-        #"7. If you look at those features which also have textual annotation, what is the top 10 most common word found in that annotation?\n",
+        #9. Combining your answers for Q6 and Q7, what are the 10 most commons words found for the largest InterPRO features?
+        Q9_explain = 
+        Q9_answer = 
+        Q9 = 
 
-        #"8. And the top 10 least common?\n",
+        #10. What is the coefficient of correlation ($R^2$) between the size of the protein and the number of features found?
+        Q10_explain = 
+        Q10_answer = 
+        Q10 = 
 
-        #"9. Combining your answers for Q6 and Q7, what are the 10 most commons words found for the largest InterPRO features?\n",
-
-        #"10. What is the coefficient of correlation ($R^2$) between the size of the protein and the number of features found?\n",
-
-        Question = list(range(1, 3))
-        Answer = list([Q1_answer, Q2_answer])
-        Explain = list([Q1_explain, Q2_explain])
+        Question = list(range(1, 11))
+        Answer = list([Q1_answer, Q2_answer, Q3_answer, Q4_answer, Q5_answer, Q6_answer, Q7_answer, Q8_answer, Q9_answer, Q10_answer])
+        Explain = list([Q1_explain, Q2_explain, Q3_explain, Q4_explain, Q5_explain, Q6_explain, Q7_explain, Q8_explain, Q9_explain, Q10_explain])
         data = pd.DataFrame(list(zip(Question, Answer, Explain)), columns = ["Question", "Answer", "Explain"])
         data.to_csv("output/assignment5.csv", index=False)
 
