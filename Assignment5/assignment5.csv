@@ -1,0 +1,55 @@
+Question,Answer,Explain
+1,9703.0,"== Parsed Logical Plan ==
+Deduplicate [_c11#28]
++- Filter NOT (_c11#28 = -)
+   +- Project [_c11#28]
+      +- Relation [_c0#17,_c1#18,_c2#19,_c3#20,_c4#21,_c5#22,_c6#23,_c7#24,_c8#25,_c9#26,_c10#27,_c11#28,_c12#29,_c13#30,_c14#31] csv
+
+== Analyzed Logical Plan ==
+_c11: string
+Deduplicate [_c11#28]
++- Filter NOT (_c11#28 = -)
+   +- Project [_c11#28]
+      +- Relation [_c0#17,_c1#18,_c2#19,_c3#20,_c4#21,_c5#22,_c6#23,_c7#24,_c8#25,_c9#26,_c10#27,_c11#28,_c12#29,_c13#30,_c14#31] csv
+
+== Optimized Logical Plan ==
+Aggregate [_c11#28], [_c11#28]
++- Project [_c11#28]
+   +- Filter (isnotnull(_c11#28) AND NOT (_c11#28 = -))
+      +- Relation [_c0#17,_c1#18,_c2#19,_c3#20,_c4#21,_c5#22,_c6#23,_c7#24,_c8#25,_c9#26,_c10#27,_c11#28,_c12#29,_c13#30,_c14#31] csv
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[_c11#28], functions=[], output=[_c11#28])
+   +- Exchange hashpartitioning(_c11#28, 200), ENSURE_REQUIREMENTS, [id=#36]
+      +- HashAggregate(keys=[_c11#28], functions=[], output=[_c11#28])
+         +- Filter (isnotnull(_c11#28) AND NOT (_c11#28 = -))
+            +- FileScan csv [_c11#28] Batched: false, DataFilters: [isnotnull(_c11#28), NOT (_c11#28 = -)], Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/data/dataprocessing/interproscan/all_bacilli.tsv], PartitionFilters: [], PushedFilters: [IsNotNull(_c11), Not(EqualTo(_c11,-))], ReadSchema: struct<_c11:string>
+"
+2,198.06420694630526,"== Parsed Logical Plan ==
+Deduplicate [_c11#28]
++- Filter NOT (_c11#28 = -)
+   +- Project [_c11#28]
+      +- Relation [_c0#17,_c1#18,_c2#19,_c3#20,_c4#21,_c5#22,_c6#23,_c7#24,_c8#25,_c9#26,_c10#27,_c11#28,_c12#29,_c13#30,_c14#31] csv
+
+== Analyzed Logical Plan ==
+_c11: string
+Deduplicate [_c11#28]
++- Filter NOT (_c11#28 = -)
+   +- Project [_c11#28]
+      +- Relation [_c0#17,_c1#18,_c2#19,_c3#20,_c4#21,_c5#22,_c6#23,_c7#24,_c8#25,_c9#26,_c10#27,_c11#28,_c12#29,_c13#30,_c14#31] csv
+
+== Optimized Logical Plan ==
+Aggregate [_c11#28], [_c11#28]
++- Project [_c11#28]
+   +- Filter (isnotnull(_c11#28) AND NOT (_c11#28 = -))
+      +- Relation [_c0#17,_c1#18,_c2#19,_c3#20,_c4#21,_c5#22,_c6#23,_c7#24,_c8#25,_c9#26,_c10#27,_c11#28,_c12#29,_c13#30,_c14#31] csv
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[_c11#28], functions=[], output=[_c11#28])
+   +- Exchange hashpartitioning(_c11#28, 200), ENSURE_REQUIREMENTS, [id=#153]
+      +- HashAggregate(keys=[_c11#28], functions=[], output=[_c11#28])
+         +- Filter (isnotnull(_c11#28) AND NOT (_c11#28 = -))
+            +- FileScan csv [_c11#28] Batched: false, DataFilters: [isnotnull(_c11#28), NOT (_c11#28 = -)], Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/data/dataprocessing/interproscan/all_bacilli.tsv], PartitionFilters: [], PushedFilters: [IsNotNull(_c11), Not(EqualTo(_c11,-))], ReadSchema: struct<_c11:string>
+"

@@ -32,12 +32,12 @@ class InterPRO_PS:
     def get_questions(self, df):
         
         #Question 1. How many distinct protein annotations are found in the dataset? I.e. how many distinc InterPRO numbers are there?
-        Q1_explain = df.select("_c11").filter(df._c11 != "-").distinct().explain()
+        Q1_explain = df.select("_c11").filter(df._c11 != "-").distinct()._jdf.queryExecution().toString()
         Q1_answer = df.select("_c11").filter(df._c11 != "-").distinct().count()
         Q1 = [1, Q1_answer, Q1_explain]
 
         #question 2. How many annotations does a protein have on average?
-        Q2_explain = df.select("_c11").filter(df._c11 != "-").distinct().explain()
+        Q2_explain = df.select("_c11").filter(df._c11 != "-").distinct()._jdf.queryExecution().toString()
         Q2_answer = df.select("_c11").filter(df._c11 != "-").count() / df.select("_c11").filter(df._c11 != "-").distinct().count()
         Q2 = [2, Q2_answer, Q2_explain]
 
