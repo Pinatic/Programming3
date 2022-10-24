@@ -21,24 +21,24 @@ class InterPRO_PS:
             .getOrCreate()
         return spark
 
-    def file_loader(self, path, dilim, pyspark_obj):
+    def file_loader(self, path, sep, pyspark_obj):
         """
         Loads in the tsv file and returns the data
         .tsv uses /t dilimiter
         """
-        data = pyspark_obj.read.options(dilimiter=dilim).csv(path)
+        data = pyspark_obj.read.option("sep", sep).csv(path)
         return data
     
     def get_questions(self, df):
         
         #Question 1. How many distinct protein annotations are found in the dataset? I.e. how many distinc InterPRO numbers are there?
-        Q1_explain = df.select("_c12").filter(df._c12 != "-").distinct().explain()
-        Q1_answer = df.select("_c12").filter(df._c12 != "-").distinct().count()
+        Q1_explain = df.select("_c11").filter(df._c11 != "-").distinct().explain()
+        Q1_answer = df.select("_c11").filter(df._c11 != "-").distinct().count()
         Q1 = [1, Q1_answer, Q1_explain]
 
         #question 2. How many annotations does a protein have on average?
-        Q2_explain = df.select("_c12").filter(df._c12 != "-").distinct().explain()
-        Q2_answer = df.select("_c12").filter(df._c12 != "-").count / df.select("_c12").filter(df._c12 != "-").distinct().count
+        Q2_explain = df.select("_c11").filter(df._c11 != "-").distinct().explain()
+        Q2_answer = df.select("_c11").filter(df._c11 != "-").count() / df.select("_c11").filter(df._c11 != "-").distinct().count()
         Q2 = [2, Q2_answer, Q2_explain]
 
 
@@ -62,7 +62,7 @@ class InterPRO_PS:
         Question = list(range(1, 3))
         Answer = list([Q1_answer, Q2_answer])
         Explain = list([Q1_explain, Q2_explain])
-        data = pd.DataFrame({"Question": Question, "Answer": Answer, "Explain": Explain})
+        data = pd.DataFrame(list(zip(Question, Answer, Explain)), columns = ["Question", "Answer", "Explain"])
         data.to_csv("output/assignment5.csv", index=False)
 
 #output should be csv with 3 columns:
