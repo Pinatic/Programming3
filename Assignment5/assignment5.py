@@ -34,52 +34,44 @@ class InterPRO_PS:
         #1. How many distinct protein annotations are found in the dataset? I.e. how many distinc InterPRO numbers are there?
         Q1_explain = df.select("_c11").filter(df._c11 != "-").distinct()._jdf.queryExecution().toString()
         Q1_answer = df.select("_c11").filter(df._c11 != "-").distinct().count()
-        Q1 = [1, Q1_answer, Q1_explain]
 
         #2. How many annotations does a protein have on average?
         Q2_explain = df.select("_c11").filter(df._c11 != "-").distinct()._jdf.queryExecution().toString()
         Q2_answer = df.select("_c11").filter(df._c11 != "-").count() / df.select("_c11").filter(df._c11 != "-").distinct().count()
-        Q2 = [2, Q2_answer, Q2_explain]
 
         #3. What is the most common GO Term found?
         Q3_explain = df.withColumn("_c13", explode(split(col("_c13"), "\\|"))).select("_c13").filter(df._c13 != "-").agg({"_c13": "max"})._jdf.queryExecution().toString()
         Q3_answer = df.withColumn("_c13", explode(split(col("_c13"), "\\|"))).select("_c13").filter(df._c13 != "-").agg({"_c13": "max"}).collect()[0][0]
-        Q3 = [3, Q3_answer, Q3_explain]
 
         #4. What is the average size of an InterPRO feature found in the dataset?
         Q4_explain = df.select(abs(df._c7 - df._c8)).agg({"abs((_c7 - _c8" : "mean"})._jdf.queryExecution().toString()
         Q4_answer = df.select(abs(df._c7 - df._c8)).agg({"abs((_c7 - _c8" : "mean"}).collect()[0][0]
-        Q4 = [4, Q4_answer, Q4_explain]
 
         #5. What is the top 10 most common InterPRO features?
-        Q5_explain = 
-        Q5_answer = 
-        Q5 = 
+        Q5_explain = df.filter(df._c11 != "-").groupBy("_c11").count()._jdf.queryExecution().toString()
+        Q5_df_fg = df.filter(df._c11 != "-").groupBy("_c11").count()
+        Q5_answer = Q5_df_fg.orderBy(Q5_df_fg["count"].desc()).head(10)
+        q5_answer = [Q5_answer[n].__getitem__("_c11") for n, i in enumerate(q5_answer)]
 
         #6. If you select InterPRO features that are almost the same size (within 90-100%) as the protein itself, what is the top10 then?
         Q6_explain = 
         Q6_answer = 
-        Q6 = 
 
         #7. If you look at those features which also have textual annotation, what is the top 10 most common word found in that annotation?
         Q7_explain = 
         Q7_answer = 
-        Q7 = 
 
         #8. And the top 10 least common?
         Q8_explain = 
         Q8_answer = 
-        Q8 = 
 
         #9. Combining your answers for Q6 and Q7, what are the 10 most commons words found for the largest InterPRO features?
         Q9_explain = 
         Q9_answer = 
-        Q9 = 
 
         #10. What is the coefficient of correlation ($R^2$) between the size of the protein and the number of features found?
         Q10_explain = 
         Q10_answer = 
-        Q10 = 
 
         Question = list(range(1, 11))
         Answer = list([Q1_answer, Q2_answer, Q3_answer, Q4_answer, Q5_answer, Q6_answer, Q7_answer, Q8_answer, Q9_answer, Q10_answer])
