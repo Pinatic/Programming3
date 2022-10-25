@@ -66,8 +66,10 @@ class InterPRO_PS:
         Q7_answer = [Q7_answer[n].__getitem__("_c12") for n, i in enumerate(Q7_answer)]
 
         #8. And the top 10 least common?
-        Q8_explain = 
-        Q8_answer = 
+        Q8_explain = df.filter(df._c12 != "-").select("_c12").withColumn("_c12", explode(split(col("_c12"), " "))).groupBy("_c12").count().sort("count", ascending = True)._jdf.queryExecution().toString()
+        Q8_answer = df.filter(df._c12 != "-").select("_c12").withColumn("_c12", explode(split(col("_c12"), " "))).groupBy("_c12").count().sort("count", ascending = True).head(10)
+        Q8_answer = [Q8_answer[n].__getitem__("_c12") for n, i in enumerate(Q8_answer)]
+
 
         #9. Combining your answers for Q6 and Q7, what are the 10 most commons words found for the largest InterPRO features?
         Q9_explain = 
