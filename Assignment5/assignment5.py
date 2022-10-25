@@ -42,14 +42,14 @@ class InterPRO_PS:
         Q2 = [2, Q2_answer, Q2_explain]
 
         #3. What is the most common GO Term found?
-        Q3_explain = 
-        Q3_answer = 
-        Q3 = 
+        Q3_explain = df.groupBy("_c13").agg(df._c13.filter(df._c13 != "-")).orderBy(desc("count"))._jdf.queryExecution().toString()
+        Q3_answer = df.groupBy("_c13").agg(df._c13.filter(df._c13 != "-")).orderBy(desc("count")).take(1)
+        Q3 = [3, Q3_answer, Q3_explain]
 
         #4. What is the average size of an InterPRO feature found in the dataset?
-        Q4_explain = 
-        Q4_answer = 
-        Q4 = 
+        Q4_explain = df.select(abs(df._c7 - df._c8)).agg({"abs((_c7 - _c8" : "mean"})._jdf.queryExecution().toString()
+        Q4_answer = df.select(abs(df._c7 - df._c8)).agg({"abs((_c7 - _c8" : "mean"}).collect()[0][0]
+        Q4 = [4, Q4_answer, Q4_explain]
 
         #5. What is the top 10 most common InterPRO features?
         Q5_explain = 
