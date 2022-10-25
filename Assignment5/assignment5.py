@@ -73,7 +73,8 @@ class InterPRO_PS:
 
         #9. Combining your answers for Q6 and Q7, what are the 10 most commons words found for the largest InterPRO features?
         Q9_explain = 
-        Q9_answer = 
+        Q9_df = df.where(col("_c11").isin(Q6_answer)).filter(df._c12 != "-") #not finished
+        Q9_answer = [Q9_df[n].__getitem__("_c12") for n, i in enumerate(Q9_df)]
 
         #10. What is the coefficient of correlation ($R^2$) between the size of the protein and the number of features found?
         Q10_explain = 
