@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import pyspark
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import explode, split, col
+from pyspark.sql.functions import explode, split, col, *
 
 
 class InterPRO_PS:
@@ -72,13 +72,14 @@ class InterPRO_PS:
 
 
         #9. Combining your answers for Q6 and Q7, what are the 10 most commons words found for the largest InterPRO features?
-        Q9_explain = 
-        Q9_df = df.where(col("_c11").isin(Q6_answer)).filter(df._c12 != "-") #not finished
+        Q9_explain = df.where(col("_c11").isin(Q6_answer)).filter(df._c12 != "-").select("_c12").withColumn("_c12", explode(split(col("_c12"), " "))).groupBy("_c12").count().sort("count", ascending = False)._jdf.queryExecution().toString()
+        Q9_df = df.where(col("_c11").isin(Q6_answer)).filter(df._c12 != "-").select("_c12").withColumn("_c12", explode(split(col("_c12"), " "))).groupBy("_c12").count().sort("count", ascending = False).head(10)
         Q9_answer = [Q9_df[n].__getitem__("_c12") for n, i in enumerate(Q9_df)]
 
         #10. What is the coefficient of correlation ($R^2$) between the size of the protein and the number of features found?
-        Q10_explain = 
-        Q10_answer = 
+        Q10_explain = df.select(df._c0, df._c2, df._c11).filter(df._c11 != "-").groupBy(df._c0, "_c2").count()._jdf.queryExecution().toString()
+        Q10_df = df.select(df._c0, df._c2, df._c11).filter(df._c11 != "-").groupBy(df._c0, "_c2").count()
+        Q10_answer = Q10_df.corr("_c2", "count") ** 2
 
         Question = list(range(1, 11))
         Answer = list([Q1_answer, Q2_answer, Q3_answer, Q4_answer, Q5_answer, Q6_answer, Q7_answer, Q8_answer, Q9_answer, Q10_answer])
