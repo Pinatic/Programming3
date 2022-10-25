@@ -3,7 +3,9 @@ import pandas as pd
 import os
 import pyspark
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import explode, split, col, *
+from pyspark.sql.functions import explode, split, col
+from pyspark.sql.functions import *
+from pyspark.sql.types import FloatType
 
 
 class InterPRO_PS:
@@ -45,19 +47,19 @@ class InterPRO_PS:
         Q3_answer = df.withColumn("_c13", explode(split(col("_c13"), "\\|"))).select("_c13").filter(df._c13 != "-").agg({"_c13": "max"}).collect()[0][0]
 
         #4. What is the average size of an InterPRO feature found in the dataset?
-        Q4_explain = df.select(abs(df._c7 - df._c8)).agg({"abs((_c7 - _c8" : "mean"})._jdf.queryExecution().toString()
-        Q4_answer = df.select(abs(df._c7 - df._c8)).agg({"abs((_c7 - _c8" : "mean"}).collect()[0][0]
+        Q4_explain = df.select(abs(df._c7 - df._c8)).agg({"abs((_c7 - _c8))" : "mean"})._jdf.queryExecution().toString()
+        Q4_answer = df.select(abs(df._c7 - df._c8)).agg({"abs((_c7 - _c8))" : "mean"}).collect()[0][0]
 
         #5. What is the top 10 most common InterPRO features?
         Q5_explain = df.filter(df._c11 != "-").groupBy("_c11").count()._jdf.queryExecution().toString()
         Q5_df_fg = df.filter(df._c11 != "-").groupBy("_c11").count()
         Q5_answer = Q5_df_fg.orderBy(Q5_df_fg["count"].desc()).head(10)
-        q5_answer = [Q5_answer[n].__getitem__("_c11") for n, i in enumerate(Q5_answer)]
+        Q5_answer = [Q5_answer[n].__getitem__("_c11") for n, i in enumerate(Q5_answer)]
 
         #6. If you select InterPRO features that are almost the same size (within 90-100%) as the protein itself, what is the top10 then?
         Q6_explain = df.withColumn("percentage", (df._c7 - df._c8) / df._c2).sort("percentage")
         Q6_df = df.withColumn("percentage", (df._c7 - df._c8) / df._c2).sort("percentage")
-        Q6_answer = Q6_df.filter(df._c11 != "-").filter(Q6_df.percentage > 0.9).groupBy("_c11").count.sort("count, ascending = False").head(10)
+        Q6_answer = Q6_df.filter(df._c11 != "-").filter(Q6_df.percentage > 0.9).groupBy("_c11").count().sort("count", ascending = False).head(10)
         Q6_answer = [Q6_answer[n].__getitem__("_c11") for n, i in enumerate(Q6_answer)]
 
         #7. If you look at those features which also have textual annotation, what is the top 10 most common word found in that annotation?
@@ -79,6 +81,7 @@ class InterPRO_PS:
         #10. What is the coefficient of correlation ($R^2$) between the size of the protein and the number of features found?
         Q10_explain = df.select(df._c0, df._c2, df._c11).filter(df._c11 != "-").groupBy(df._c0, "_c2").count()._jdf.queryExecution().toString()
         Q10_df = df.select(df._c0, df._c2, df._c11).filter(df._c11 != "-").groupBy(df._c0, "_c2").count()
+        Q10_df = Q10_df.withColumn("_c2", Q10_df["_c2"].cast(FloatType()))
         Q10_answer = Q10_df.corr("_c2", "count") ** 2
 
         Question = list(range(1, 11))
