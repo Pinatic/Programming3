@@ -51,11 +51,13 @@ class InterPRO_PS:
         Q5_explain = df.filter(df._c11 != "-").groupBy("_c11").count()._jdf.queryExecution().toString()
         Q5_df_fg = df.filter(df._c11 != "-").groupBy("_c11").count()
         Q5_answer = Q5_df_fg.orderBy(Q5_df_fg["count"].desc()).head(10)
-        q5_answer = [Q5_answer[n].__getitem__("_c11") for n, i in enumerate(q5_answer)]
+        q5_answer = [Q5_answer[n].__getitem__("_c11") for n, i in enumerate(Q5_answer)]
 
         #6. If you select InterPRO features that are almost the same size (within 90-100%) as the protein itself, what is the top10 then?
-        Q6_explain = 
-        Q6_answer = 
+        Q6_explain = df.withColumn("percentage", (df._c7 - df._c8) / df._c2).sort("percentage")
+        Q6_df = df.withColumn("percentage", (df._c7 - df._c8) / df._c2).sort("percentage")
+        Q6_answer = Q6_df.filter(df._c11 != "-").filter(Q6_df.percentage > 0.9).groupBy("_c11").count.sort("count, ascending = False").head(10)
+        Q6_answer = [Q6_answer[n].__getitem__("_c11") for n, i in enumerate(Q6_answer)]
 
         #7. If you look at those features which also have textual annotation, what is the top 10 most common word found in that annotation?
         Q7_explain = 
