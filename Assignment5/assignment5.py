@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import pyspark
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import explode, split, col
 
 
 class InterPRO_PS:
@@ -60,8 +61,9 @@ class InterPRO_PS:
         Q6_answer = [Q6_answer[n].__getitem__("_c11") for n, i in enumerate(Q6_answer)]
 
         #7. If you look at those features which also have textual annotation, what is the top 10 most common word found in that annotation?
-        Q7_explain = 
-        Q7_answer = 
+        Q7_explain = df.filter(df._c12 != "-").select("_c12").withColumn("_c12", explode(split(col("_c12"), " "))).groupBy("_c12").count().sort("count", ascending = False)._jdf.queryExecution().toString()
+        Q7_answer = df.filter(df._c12 != "-").select("_c12").withColumn("_c12", explode(split(col("_c12"), " "))).groupBy("_c12").count().sort("count", ascending = False).head(10)
+        Q7_answer = [Q7_answer[n].__getitem__("_c12") for n, i in enumerate(Q7_answer)]
 
         #8. And the top 10 least common?
         Q8_explain = 
