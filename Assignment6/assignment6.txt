@@ -1,0 +1,95 @@
+1. Introduction
+This final assignment of the course Programming 3 is broader in scope and more open-ended than 
+the other assignments of the course (1-5). Unlike the previous assignments it is not automatically 
+graded by a script as pass/fail, and the technology you use for your solution is not predetermined 
+like in the other assignments. This is an open-ended investigation of a big-data problem and you will 
+need to hand in a report about your work. You can choose any of the technologies that were introduced 
+in this course, or ones you already know, and mix them up if it helps you solve the problem in time.
+
+2. Deliverables
+You should make an "Assignment6" folder in your "programming3" GitHub repo. In it should be your 
+programming code and one file "report.pdf" which is your report on this project (see below). 
+There is no further structure imposed; you are free to structure your project in whichever way fits your goals best. 
+You should aim to document your code in the Python-appropriate way (comments, docstrings), 
+it should be object-oriented where that makes sense and it should definitely have a high (>8) 
+Pylint score but otherwise it is your code and you can write it the way you like.
+
+2.1. The Report
+3. Deadline
+4. Project 1
+4.1. Introduction
+The first project you can choose is a continuation of the InterPROscan dataset you worked on for Assignment 5.
+You now know the structure and type of data that is involved. What I would ike you to do is to develop scikit-learn
+machine learning models to predict the function of the proteins in the dataset. I'm not going to mandate
+any particular model, but you should use your knowledge from DS3 to determine good candidate methods and
+try a couple, and report on yourGiven the size of the data, you should train your machine models in parallel!
+Dask is an obvious candidate for this, but you can also use any of the other frameworks we discussed in the course.
+
+The "function" of the protein which is the "class" your model should predict is defined as the InterPRO number which covers:
+
+>90% of the protein's sequence
+Covers the largest length of the sequence
+The "features" that you use to predict that class are the other, smaller, InterPRO annotations.
+Take care to remove "noise" from the dataset, ie. lines from the TSV file which don't contain InterPRO numbers,
+proteins which don't have a large feature (according to the criteria above) etc.
+Be sure to note in your report how you processed the data and why you made the choices you did!
+
+Your script should, given one or more of these TSV files with InterPROscan annotations,
+produce models (Pickle them to save them!) which predict protein function, and a file of training-data on which you trained them.
+
+5. Project 2
+5.1. Introduction
+The second project you can choose is an investigation of the scientific literature. 
+In the data/datasets/NCBI/Pubmed directory on the assemblix computers, you can find 
+a copy of the entire PubMed literature database in XML format. The project is to use 
+your knowledge of graph theory and parallel processing to investigate the structure of 
+publishing in the scientific world. Specifically, I would like to answer the following questions:
+
+1. How large a group of co-authors does the average publication have?
+2. Do authors mostly publish using always the same group of authors?
+3. Do authors mainly reference papers with other authors with whom they've co-authored papers (including themselves)?
+4. What is the distribution in time for citations of papers in general, and for papers with the highest number of citations?
+    Do they differ?
+5. Is there a correlation between citations and the number of keywords that papers share?
+    I.e. papers which share the same subject cite each other more often.
+6. For the most-cited papers (define your own cutoff), is the correlation in shared keywords 
+    between them and the papers that cite them different from (5)?
+
+You should choose or define appropriate measures (statistical, graph theoretical) to answer these questions — and 
+motivate your answer in your report!
+
+Note that it probably helps to parse the actual NCBI XML data only once and then save it in another,
+ smaller format suitable to answering the questions (e.g. a NetworkX datastructure).
+
+Your script should take as input the directory of PubMed abstracts in /data/dataprocessing/NCBI/PubMed/ 
+(on both assemblix servers) and produce nothing but a CSV with the questions asked above and the number 
+that answers that question. Please note that the numbers will differ depending on what you choose to use 
+as metrics, and there is no "right" answer! It's about how you motivate the answers that those numbers 
+represent in your report, not the numbers themselves.
+
+6. Project 3
+6.1. Introduction
+The KEGG pathway database contains information about which proteins are organised in pathways in different 
+model organisms – and eventually all organisms.
+
+For this project, I would like you to develop a parallel pipeline which maps a MinION metagenomics dataset 
+onto KEGG pipeline data. This will involve two steps (at least):
+
+The data can be found at /data/dataprocessing/MinIONData/ (on both assemblixes). The MinION reads to be mapped 
+are in "all.fq" and the index to map against is "all_bacteria.fna" (UPDATE: there's also a pre-generated Minimap2 
+index called "all_bacteria.mmi" that you can use instead of the .fna file. This saves some time.)
+
+1. Mapping the data using the Minimap2 sequence mapper onto all known Bacteria
+2. Taking the best "hits" and using the KEGG API to find out which pathway they're in.
+
+Specifically, you will need to search through a number of parameters. There will be a number of settings of 
+Minimap2 and choices what defines a best "hit" (often not the best as measured by alignment score but by being 
+in a better-known model organism). Find out the best combination of these parameters, and motivate what led you 
+to choose them in your report.
+
+The deliverable is a script which, given some new set of MinION sequencing results, maps the reads onto KEGG via 
+the 2-step procedure above, and reports a table summarizing number of hits per KEGG pathway.
+
+6.2. Extra information:
+The KEGG database and API (https://www.genome.jp/kegg/) (https://www.kegg.jp/kegg/rest/)
+The Minimap2 documentation (minimap2 has been installed in the /commons/conda env) (https://github.com/lh3/minimap2)
