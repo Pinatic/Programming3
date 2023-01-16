@@ -36,14 +36,23 @@ def cleaner(self, ddf):
 
 def coverage_calc(ddf):
     """
-    calculate percentage the feature covers on the total protein lenght
+    calculate percentage the feature covers on the total protein length
+    use with .apply() method
 
-    returns:
-        0 if Interpro_acc < 0.90
-        1 if Interpro_acc > 0.90
+    returns percentage the feature covers on the protein length
+     
     """
+    
+    Size = (ddf["Stop"] - ddf["Start"]) / ddf["Seq_lenght"]
+    return Size
 
-    if ((ddf["stop"] - ddf["start"]) / ddf["Seq_lenght"]) > 0.90:
-        return 1
-    else:
-        return 0
+def 
+
+
+
+if __name__ == "__main__":
+    ddf = file_loader(path, "\t")
+    ddf = cleaner(ddf)
+    ddf["Size"] = ddf.apply(lambda x:coverage_calc(x), axis = 1)
+
+
