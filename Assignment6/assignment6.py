@@ -46,7 +46,7 @@ def coverage_calc(ddf):
     Size = (ddf["Stop"] - ddf["Start"]) / ddf["Seq_lenght"]
     return Size
 
-def remove_no_large(ddf):
+def remove_no_large_small(ddf):
     """
     Returns proteins that have a large feature (>90% of the proteins sequence)
     And that also have at least one small feature
@@ -57,12 +57,27 @@ def remove_no_large(ddf):
     if (ddf["Size"] > 0.90).any() and (ddf["Size"] < 0.90).any():
         return ddf
 
+def group_splitter(ddf):
+    """
+    Takes the dataframe and splits this into two dataframes
+    one dataframe containing the largests sequence per protein
+    one dataframe that contains all the other sequences
+
+    returns:
+        ddf_large
+        ddf_small
+    """
+    idx = ddf.groupby(["Protein_acc"])["Size"].transform(max)
+    ddf_large = ddf[idx == ddf["Size"]]
+    ddf_small = ddf[~(idx == ddf["Size"])]
+    return ddf_large, ddf_small
+
 
 if __name__ == "__main__":
     ddf = file_loader(path, "\t")
     ddf = cleaner(ddf)
     ddf["Size"] = ddf.apply(lambda x:coverage_calc(x), axis = 1)
-    #Taking only the proteins that have a large interpro accession
-    ddf = ddf.groupby("Protein_acc").apply(remove_no_large).reset_index(drop = True)
-
+    #Taking only the proteins that have a large and a small interpro accession
+    ddf = ddf.groupby(["Protein_acc"]).apply(remove_no_large_small).reset_index(drop = True)
+    ddf_large, ddf_small = group_splitter(ddf)
 
