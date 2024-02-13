@@ -2,9 +2,12 @@ import pandas as pd
 import numpy as np
 import dask.dataframe as dd
 import dask.array as da
+from dask.distributed import Client
 import time
 import pickle
+import joblib
 
+#Starting time
 start = time.time()
 
 #path = "/data/dataprocessing/interproscan/all_bacilli.tsv"
@@ -73,6 +76,11 @@ def group_splitter(ddf):
     return ddf_large, ddf_small
 
 
+def merge_groups(ddf_large, ddf_small):
+    """
+    
+    """
+
 if __name__ == "__main__":
     ddf = file_loader(path, "\t")
     ddf = cleaner(ddf)
@@ -80,4 +88,9 @@ if __name__ == "__main__":
     #Taking only the proteins that have a large and a small interpro accession
     ddf = ddf.groupby(["Protein_acc"]).apply(remove_no_large_small).reset_index(drop = True)
     ddf_large, ddf_small = group_splitter(ddf)
+    
+    client = Client()
+    with joblib.parallel_backend("dask"):
+
+        ddf_small_piv = dd.reshape.pivot_table(ddf_small, index="Protein_acc", columns="Interpro_acc", values="Size")
 
