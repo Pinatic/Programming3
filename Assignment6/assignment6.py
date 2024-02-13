@@ -18,7 +18,12 @@ def file_loader(path, sep):
     only loads in columns 0, 2, 6, 7, 11
     renames these columns Protein_acc, Seq_lenght, Start, Stop, Interpro_acc
 
-    returns dask dataframe
+    Arguments:
+        Path:   Path to the data
+        Sep:    Seperator used
+
+    Returns:
+        ddf:    Dask dataframe of the data 
     """
 
     ddf = dd.read_csv(path, sep, usecols = [0,2,6,7,11], names = ["Protein_acc", "Seq_lenght", "Start", "Stop", "Interpro_acc"])
@@ -27,10 +32,14 @@ def file_loader(path, sep):
 
 def cleaner(ddf):
     """
-    removes rows containing - in collumn Interpro_acc
+    Removes rows containing - in collumn Interpro_acc
     drops duplicates
 
-    returns dask dataframe
+    Arguments:
+        ddf:    Dask dataframe of the data
+
+    Returns:
+        ddf:    Dask dataframe witouth rows containing - in collumn Intrpro_acc
     """
     ddf = ddf[ddf["Interpro_acc"] != "-"]
     ddf = ddf.drop_duplicates()
@@ -39,10 +48,14 @@ def cleaner(ddf):
 
 def coverage_calc(ddf):
     """
-    calculate percentage the feature covers on the total protein length
+    Calculate percentage the feature covers on the total protein length
     use with .apply() method
 
-    returns percentage the feature covers on the protein length
+    Arguments:
+        ddf:    Dask dataframe
+
+    Returns:
+        Size:   Percentage the feature covers on the protein length
      
     """
     
@@ -55,7 +68,11 @@ def remove_no_large_small(ddf):
     And that also have at least one small feature
     use with .apply() method
 
-    returns dask dataframe 
+    Arguments:
+        ddf:    Dask dataframe object grouped by protein
+
+    Returns:
+        ddf:    Dask dataframe 
     """
     if (ddf["Size"] > 0.90).any() and (ddf["Size"] < 0.90).any():
         return ddf
@@ -66,20 +83,33 @@ def group_splitter(ddf):
     one dataframe containing the largests sequence per protein
     one dataframe that contains all the other sequences
 
-    returns:
-        ddf_large
-        ddf_small
+    Arguments:
+        ddf:    Dask dataframe
+
+    Returns:
+        ddf_large:  Dask dataframe of the largest sequence per protein
+        ddf_small:  Dask dataframe of all other smaller sequences per protein
     """
     idx = ddf.groupby(["Protein_acc"])["Size"].transform(max)
     ddf_large = ddf[idx == ddf["Size"]]
     ddf_small = ddf[~(idx == ddf["Size"])]
     return ddf_large, ddf_small
 
+def merge_groups(ddf_large, ddf_small_piv):
+    """
+    Takes the dataframe containing large interpro accessions and the pivoted small interpro dataframe
+    merges the small interpro dataframe with the large interpro dataframe on protein
 
-def merge_groups(ddf_large, ddf_small):
-    """
+    Arguments:
+        ddf_large:      Dask dataframe of largest sequence per protein
+        ddf_small_piv:  Dask dataframe where columns are small interpro accessions with their counts as values
     
+    returns:
+        dff_full:   Dask dataframe of the largest sequence per protein with the count of smaller sequence that this protein also contains
     """
+    ddf_full = ddf_small_piv.merge(ddf_large, how="inner", left_on="Protein_acc", right_on="Protein_acc")
+    ddf_full = ddf_full.replace(np.nan, 0)
+    return ddf_full
 
 if __name__ == "__main__":
     ddf = file_loader(path, "\t")
@@ -91,6 +121,12 @@ if __name__ == "__main__":
     
     client = Client()
     with joblib.parallel_backend("dask"):
+        #Counting the number of small interpro accessions for each protein
+        ddf_small = ddf_small.groupby(["Protein_acc", "Interpro_acc"])["Size"].agg("count").reset_index()
+        #Pivoting the dataframe containing the small interpro accessions in preperation of merging with the large accession dataframe
+        ddf_small_piv = ddf_small.pivot(index="Protein_acc", columns="Interpro_acc", values="Size")
+        #Merging the dataframes
+        ddf_full = merge_groups(ddf_large, ddf_small_piv)
+        
 
-        ddf_small_piv = dd.reshape.pivot_table(ddf_small, index="Protein_acc", columns="Interpro_acc", values="Size")
 
