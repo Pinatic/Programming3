@@ -3,6 +3,8 @@ import numpy as np
 import dask.dataframe as dd
 import dask.array as da
 from dask.distributed import Client
+from dask_ml.model_selection import train_test_split
+from dask_ml.preprocessing import OneHotEncoder
 import time
 import pickle
 import joblib
@@ -111,6 +113,18 @@ def merge_groups(ddf_large, ddf_small_piv):
     ddf_full = ddf_full.replace(np.nan, 0)
     return ddf_full
 
+def train_test_split(ddf_full):
+    """
+    
+    """
+    y = OneHotEncoder().fit_transform(ddf_full[["Interpro_acc"]])
+    X = ddf_full.iloc[:,1:-2].to_dask_array(lenghts=True)
+    
+    X_train, X_test, Y_train, Y_test = train_test_split(X, y, random_state = 24, convert_mixed_types = True)
+
+    return X_train, X_test, Y_train, Y_test
+
+
 if __name__ == "__main__":
     ddf = file_loader(path, "\t")
     ddf = cleaner(ddf)
@@ -118,6 +132,7 @@ if __name__ == "__main__":
     #Taking only the proteins that have a large and a small interpro accession
     ddf = ddf.groupby(["Protein_acc"]).apply(remove_no_large_small).reset_index(drop = True)
     ddf_large, ddf_small = group_splitter(ddf)
+    ddf_large = ddf_large.drop(columns=["Start", "Stop", "Seq_lenght"])
     
     client = Client()
     with joblib.parallel_backend("dask"):
@@ -127,6 +142,16 @@ if __name__ == "__main__":
         ddf_small_piv = ddf_small.pivot(index="Protein_acc", columns="Interpro_acc", values="Size")
         #Merging the dataframes
         ddf_full = merge_groups(ddf_large, ddf_small_piv)
-        
+        #Splitting the dataframe into sets
+        X_train, X_test, Y_train, Y_test = train_test_split(ddf_full)
 
 
+
+# randomforest?
+
+#End time
+stop = time.time()
+
+duration = stop-start
+
+print("Total duration:", duration)
