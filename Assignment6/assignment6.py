@@ -161,7 +161,8 @@ if __name__ == "__main__":
         #in preperation of merging with the large accession dataframe
         ddf_small = ddf_small.categorize(columns=['Interpro_acc'])
         ddf_large = ddf_large.categorize(columns=['Interpro_acc'])
-        ddf_small_piv = dd.reshape.pivot_table(ddf_small, index = "Protein_acc",columns="Interpro_acc",values="Size")
+        ddf_small_piv = dd.reshape.pivot_table(ddf_small, index = "Protein_acc",
+                                               columns="Interpro_acc",values="Size")
         #Merging the dataframes
         print("merging")
         ddf_fin = merge_groups(ddf_large, ddf_small_piv)
