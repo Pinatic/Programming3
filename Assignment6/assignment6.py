@@ -16,8 +16,7 @@ from sklearn import metrics
 #Starting time
 start = time.time()
 
-#path = "/data/dataprocessing/interproscan/all_bacilli.tsv"
-path = "bacilli_sample_1000.tsv"
+path = "/data/dataprocessing/interproscan/all_bacilli.tsv"
 
 def file_loader(path, sep):
     """
@@ -152,7 +151,7 @@ if __name__ == "__main__":
     ddf_large, ddf_small = group_splitter(ddf2)
     ddf_large = ddf_large.drop(columns=["Start", "Stop", "Size", "Seq_length"])
 
-    client = Client()
+    client = Client(threads_per_worker = 4, n_workers = 4)
     with joblib.parallel_backend("dask"):
         #Counting the number of small interpro accessions for each protein
         ddf_small = ddf_small.groupby(["Protein_acc",
@@ -182,13 +181,11 @@ if __name__ == "__main__":
         #Accuracy score using metrics
         acc = metrics.accuracy_score(y_test, y_pred)
         #Saving model
-        #filename = "/students/2021-2022/master/Pieter_DSLS/rfmodel.pkl"
-        filename = "rfmodel.pkl"
+        filename = "/students/2021-2022/master/Pieter_DSLS/rfmodel.pkl"
         pickle.dump(rfc, open(filename, "wb"))
         #Saving training data
         trainingdata= dd.from_dask_array(X_train, columns=ddf_fin.columns[2:-1])
-        #trainingdata.to_csv("/students/2021-2022/master/Pieter_DSLS/trainingdata.csv")
-        trainingdata.to_csv("trainingdata.csv")
+        trainingdata.to_csv("/students/2021-2022/master/Pieter_DSLS/trainingdata.csv")
         print("accuracy:", acc)
 
     #End time
