@@ -2,21 +2,19 @@
 import time
 import pickle
 import numpy as np
-import pandas as pd
 import dask.dataframe as dd
 from dask.distributed import Client
-from dask_ml.model_selection import train_test_split
+from dask_ml import model_selection
 from dask_ml.preprocessing import OneHotEncoder
 import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 
-
-
 #Starting time
 start = time.time()
 
-path = "/data/dataprocessing/interproscan/all_bacilli.tsv"
+#path = "/data/dataprocessing/interproscan/all_bacilli.tsv"
+path = "C:/Users/Pin/Desktop/Programming3/Programming3/Assignment6/bacilli_sample_1mil.tsv"
 
 def file_loader(path, sep):
     """
@@ -118,6 +116,7 @@ def merge_groups(ddf_largest, ddf_small_pivot):
     ddf_full = ddf_small_pivot.merge(ddf_largest, how="inner",
                                    left_on="Protein_acc",right_on="Protein_acc")
     ddf_full = ddf_full.replace(np.nan, 0)
+    ddf_full = ddf_full.reset_index()
     return ddf_full
 
 def train_test_spliter(ddf_full):
@@ -134,8 +133,9 @@ def train_test_spliter(ddf_full):
         Y_test:         Y testing array
     """
     y = OneHotEncoder().fit_transform(ddf_full[["Interpro_acc"]])
-    X = ddf_full.iloc[:,1:-2].to_dask_array(lengths=True)
-    x_tr,x_t,y_tr,y_t = train_test_split(X,y,random_state=24,convert_mixed_types=True)
+    X = ddf_full.iloc[:,2:-2].to_dask_array(lengths=True).rechunk(chunk_size = "500MB")
+
+    x_tr,x_t,y_tr,y_t = model_selection.train_test_split(X,y,random_state=24,convert_mixed_types=True)
 
     return x_tr, x_t, y_tr, y_t
 
@@ -146,31 +146,37 @@ if __name__ == "__main__":
     ddf2["Size"] = ddf2.apply(lambda x:coverage_calc(x), axis = 1)
     #Taking only the proteins that have a large and a small interpro accession
     ddf2 = ddf2.groupby(["Protein_acc"]).apply(remove_no_large_small,
-        meta={'Protein_acc':'str','Seq_length':'int64','Start':'int64',
-        'Stop':'int64','Interpro_acc':'str','Size':'int64'}).reset_index(drop=True)
+        meta={"Protein_acc":"str","Seq_length":"int64","Start":"int64",
+        "Stop":"int64","Interpro_acc":"str","Size":"int64"}).reset_index(drop=True)
     ddf_large, ddf_small = group_splitter(ddf2)
-    ddf_large = ddf_large.drop(columns=["Start", "Stop", "Size", "Seq_length"])
-
-    client = Client(threads_per_worker = 4, n_workers = 4)
+    print("starting client")
+    client = Client(threads_per_worker = 1, n_workers = 4, memory_limit = "4gb", dashboard_address=':8787')
     with joblib.parallel_backend("dask"):
         #Counting the number of small interpro accessions for each protein
         ddf_small = ddf_small.groupby(["Protein_acc",
                                     "Interpro_acc"])["Size"].agg("count").reset_index()
         #Pivoting the dataframe containing the small interpro accessions
         #in preperation of merging with the large accession dataframe
-        ddf_small = ddf_small.categorize(columns=['Interpro_acc'])
-        ddf_large = ddf_large.categorize(columns=['Interpro_acc'])
+        ddf_small = ddf_small.categorize(columns=["Interpro_acc"])
+        ddf_large = ddf_large.categorize(columns=["Interpro_acc"])
         ddf_small_piv = dd.reshape.pivot_table(ddf_small, index = "Protein_acc",
                                                columns="Interpro_acc",values="Size")
         #Merging the dataframes
-        print("merging")
+        print("Merging")
         ddf_fin = merge_groups(ddf_large, ddf_small_piv)
+        ddf_fin = ddf_fin.drop(columns=["Start", "Stop", "Seq_length"])
+      
+    client = Client(threads_per_worker = 1, n_workers = 1, memory_limit = "10gb")
+    with joblib.parallel_backend("dask"):
         #Splitting the dataframe into sets
+        print("Set splitting")
         X_train, X_test, y_train, y_test = train_test_spliter(ddf_fin)
+        print("Sets made")
 
-    time_past = time.time() - start
-    print("Time pasted:", time_past,"/n", "Starting machine learning")
+    time_past = (time.time() - start)/60
+    print("Time pasted:", time_past,"Minutes", "Starting machine learning")
 
+    client = Client(threads_per_worker = 1, n_workers = 4, memory_limit = "4gb")
     with joblib.parallel_backend("dask"):
         #Creating RandomForestClassifier
         rfc = RandomForestClassifier(random_state=0)
@@ -181,16 +187,18 @@ if __name__ == "__main__":
         #Accuracy score using metrics
         acc = metrics.accuracy_score(y_test, y_pred)
         #Saving model
-        filename = "/students/2021-2022/master/Pieter_DSLS/rfmodel.pkl"
+        #filename = "/students/2021-2022/master/Pieter_DSLS/rfmodel.pkl"
+        filename = "C:/Users/Pin/Desktop/Programming3/Programming3/Assignment6/rfmodel.pkl"
         pickle.dump(rfc, open(filename, "wb"))
         #Saving training data
-        trainingdata= dd.from_dask_array(X_train, columns=ddf_fin.columns[2:-1])
-        trainingdata.to_csv("/students/2021-2022/master/Pieter_DSLS/trainingdata.csv")
+        trainingdata= dd.from_dask_array(X_train, columns=ddf_fin.columns[2:-2])
+        #trainingdata.to_csv("/students/2021-2022/master/Pieter_DSLS/trainingdata.csv")
+        trainingdata.to_csv("C:/Users/Pin/Desktop/Programming3/Programming3/Assignment6/trainingdata.csv")
         print("accuracy:", acc)
 
     #End time
     stop = time.time()
     #duration
-    duration = stop-start
+    duration = (stop-start)/60
 
-    print("Total duration:", duration)
+    print("Total duration:", duration, "Minutes")
