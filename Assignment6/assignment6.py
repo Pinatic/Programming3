@@ -14,7 +14,7 @@ from sklearn import metrics
 start = time.time()
 
 #path = "/data/dataprocessing/interproscan/all_bacilli.tsv"
-path = "C:/Users/Pin/Desktop/Programming3/Programming3/Assignment6/bacilli_sample_1mil.tsv"
+path = "C:/Users/piete/Desktop/hiero/bacilli_sample_1000000.tsv"
 
 def file_loader(path, sep):
     """
@@ -133,7 +133,7 @@ def train_test_spliter(ddf_full):
         Y_test:         Y testing array
     """
     y = OneHotEncoder().fit_transform(ddf_full[["Interpro_acc"]])
-    X = ddf_full.iloc[:,2:-2].to_dask_array(lengths=True).rechunk(chunk_size = "500MB")
+    X = ddf_full.iloc[:,2:-2].to_dask_array(lengths=True)
 
     x_tr,x_t,y_tr,y_t = model_selection.train_test_split(X,y,random_state=24,convert_mixed_types=True)
 
@@ -150,7 +150,7 @@ if __name__ == "__main__":
         "Stop":"int64","Interpro_acc":"str","Size":"int64"}).reset_index(drop=True)
     ddf_large, ddf_small = group_splitter(ddf2)
     print("starting client")
-    client = Client(threads_per_worker = 1, n_workers = 4, memory_limit = "4gb", dashboard_address=':8787')
+    client = Client(threads_per_worker = 1, n_workers = 4, memory_limit = "10gb", dashboard_address=':8787')
     with joblib.parallel_backend("dask"):
         #Counting the number of small interpro accessions for each protein
         ddf_small = ddf_small.groupby(["Protein_acc",
@@ -166,7 +166,7 @@ if __name__ == "__main__":
         ddf_fin = merge_groups(ddf_large, ddf_small_piv)
         ddf_fin = ddf_fin.drop(columns=["Start", "Stop", "Seq_length"])
       
-    client = Client(threads_per_worker = 1, n_workers = 1, memory_limit = "10gb")
+    client = Client(threads_per_worker = 1, n_workers = 1, memory_limit = "40gb")
     with joblib.parallel_backend("dask"):
         #Splitting the dataframe into sets
         print("Set splitting")
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     time_past = (time.time() - start)/60
     print("Time pasted:", time_past,"Minutes", "Starting machine learning")
 
-    client = Client(threads_per_worker = 1, n_workers = 4, memory_limit = "4gb")
+    client = Client(threads_per_worker = 1, n_workers = 4, memory_limit = "10gb")
     with joblib.parallel_backend("dask"):
         #Creating RandomForestClassifier
         rfc = RandomForestClassifier(random_state=0)
@@ -184,16 +184,16 @@ if __name__ == "__main__":
         rfc.fit(X_train, y_train)
         #Predicting
         y_pred = rfc.predict(X_test)
-        #Accuracy score using metrics
+        #Accuracy score using metrics 
         acc = metrics.accuracy_score(y_test, y_pred)
         #Saving model
         #filename = "/students/2021-2022/master/Pieter_DSLS/rfmodel.pkl"
-        filename = "C:/Users/Pin/Desktop/Programming3/Programming3/Assignment6/rfmodel.pkl"
+        filename = "C:/Users/piete/Desktop/hiero/rfmodel.pkl"
         pickle.dump(rfc, open(filename, "wb"))
         #Saving training data
         trainingdata= dd.from_dask_array(X_train, columns=ddf_fin.columns[2:-2])
         #trainingdata.to_csv("/students/2021-2022/master/Pieter_DSLS/trainingdata.csv")
-        trainingdata.to_csv("C:/Users/Pin/Desktop/Programming3/Programming3/Assignment6/trainingdata.csv")
+        trainingdata.to_csv("C:/Users/piete/Desktop/hiero/trainingdata.csv")
         print("accuracy:", acc)
 
     #End time
